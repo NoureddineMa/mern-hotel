@@ -24,6 +24,15 @@ router.post("/getroombyid", async(req, res) => {
      }
 });
 
+router.delete("/deleteroom", async(req,res) => {
+     try {
+          await Room.deleteOne({'_id': req.body.roomid})
+          res.status(200).json({message: "deleted Successfully"})
+     } catch (error) {
+          return res.status(400).json({message: error})
+     }
+})
+
 router.get("/getallrooms", async(req, res) => {
      console.log(req.body);
      try {
