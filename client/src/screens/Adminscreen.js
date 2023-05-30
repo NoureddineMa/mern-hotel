@@ -6,16 +6,26 @@ import Error from "../components/Error";
 import Loader from "../components/Loader";
 import Success from "../components/Success";
 import { Tag, Divider } from "antd";
+import { useHistory } from 'react-router-dom';
+
+
 
 
 
 const { TabPane } = Tabs;
 const user = JSON.parse(localStorage.getItem("currentUser"));
+
 function Adminscreen() {
+  const [activeTab , setActiveTab] = useState('1')
+
+  const handleTabChange = (key) => {
+    setActiveTab(key)
+  }
+
   return (
     <div className="ml-3">
         <h2 className="text-center m-2" style={{ fontSize: "35px" }}>Admin Panel</h2>
-      <Tabs defaultActiveKey="1">
+      <Tabs onChange={handleTabChange} activeKey={activeTab} >
         <TabPane tab="Bookings" key="1">
           <div className="row">
             <Bookings/>
@@ -48,6 +58,7 @@ function Adminscreen() {
 export default Adminscreen;
 
 export function Bookings() {
+
   const [bookings, setbookings] = useState([]);
   const [loading, setloading] = useState(false);
   const [error, seterror] = useState(false);
@@ -65,6 +76,8 @@ export function Bookings() {
       seterror(true);
     }
   }, []);
+
+
     return (
         <div className='col-md-11'>
             <h1>Bookings</h1>
@@ -119,6 +132,20 @@ export function Rooms() {
       seterror(true);
     }
   }, []);
+
+
+  const Delete = async (id) => {
+    await axios.delete( `/api/rooms/deleteroom/${id}`).then((data) => {
+     let filtred = rooms.filter((roo) => roo._id !== id)
+     setrooms(filtred)
+     console.log(data)
+   }).catch((err)=>{
+       console.log(err);
+   })
+}
+
+
+
     return (
         <div className='col-md-11'>
             <h1>Rooms</h1>
@@ -133,6 +160,7 @@ export function Rooms() {
                                <th>Rent Per day</th>
                                <th>Max Count</th>
                                <th>Phone Number</th>
+                               <th></th>
                            </tr>
                        </thead>
                        <tbody>
@@ -144,6 +172,7 @@ export function Rooms() {
                                    <td>{room.rentperday}</td>
                                    <td>{room.maxcount}</td>
                                    <td>{room.phonenumber}</td>
+                                   <td><button onClick={() => {Delete(room._id)}} className="bg-danger px-2">Delete</button></td>
                                </tr>
                            })}
                        </tbody>
@@ -173,6 +202,17 @@ export function Users(){
     
   }, [])
 
+
+  const Delete = async (id) => {
+     await axios.delete( `/api/users/deleteuser/${id}`).then((data) => {
+      let filtred = users.filter((user) => user._id !== id)
+      setusers(filtred)
+      console.log(data)
+    }).catch((err)=>{
+        console.log(err);
+    })
+}
+
   return(
     <div className='row'>
           {loading && (<Loader/>)}
@@ -185,19 +225,17 @@ export function Users(){
                <th>Name</th>
                <th>Email</th>
                <th>isAdmin</th>
+               <th></th>
              </tr>
            </thead>
-         
          <tbody>
-
-        
-
           {users && (users.map(user=>{
             return <tr>
               <td>{user._id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
               <td>{user.isAdmin ? 'YES' : 'NO'}</td>
+              <td><button onClick={() => {Delete(user._id)}} className="bg-danger px-2">Delete</button></td>
             </tr>
           }))}
            </tbody>
@@ -210,6 +248,7 @@ export function Users(){
 
 
 export function Addroom() {
+  const history = useHistory();
   const [room, setroom] = useState("");
   const [rentperday, setrentperday] = useState();
   const [maxcount, setmaxcount] = useState();
@@ -219,6 +258,9 @@ export function Addroom() {
   const [image1, setimage1] = useState("");
   const [image2, setimage2] = useState("");
   const [image3, setimage3] = useState("");
+
+
+
   async function addRoom()
   {
       const roomobj = {
@@ -228,7 +270,7 @@ export function Addroom() {
       try {
           const result = await axios.post('/api/rooms/addroom' , roomobj)
       } catch (error) {
-          
+            console.log(error);
       }
   }
   return (

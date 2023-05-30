@@ -27,7 +27,7 @@ function Rooms() {
             <h1>Rooms</h1>
             {loading ? (<Loader/>) : error ? (<Error/>) : (<div>
 
-                   <table className='table table-bordered table-dark'>
+                   <table className='table table-bordered'>
                        <thead className='bs'>
                            <tr>
                                <th>Room Id</th>

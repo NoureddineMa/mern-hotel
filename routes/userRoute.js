@@ -58,18 +58,16 @@ router.get("/getallusers", async(req, res) => {
   
 });
 
-router.post("/deleteuser", async(req, res) => {
-  
-    const userid = req.body.userid
-
+router.delete("/deleteuser/:id",  async (req, res) => {
+    const userId = req.params.id // Get the user id from the request parameters
     try {
-        await User.findOneAndDelete({_id : userid})
-        res.send('User Deleted Successfully')
+      await User.findByIdAndDelete(userId) // Find and delete the user with the given id
+      res.status(200).send('User deleted successfully') // Send a success response with status code 200
     } catch (error) {
-        return res.status(400).json({ message: error });
+      res.status(400).send(error.message) // Send an error response with status code 400 and the error message
     }
-
-});
+  }
+);
 
 
 
